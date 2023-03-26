@@ -18,11 +18,13 @@ go build
 ./discord-gpt-bot
 
 Usage
+
 Invite the bot to your Discord server using the Discord Developer Portal.
 
 Use the bot in any text channel by typing commands with the appropriate prefix.
 
 Commands
+
 .<query>: Sends a query to GPT-3.5-turbo and returns the response.
 Examples
 .What is the capital of France?: The bot will reply with "The capital of France is Paris."
