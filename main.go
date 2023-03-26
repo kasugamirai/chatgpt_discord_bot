@@ -53,23 +53,17 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	// Check if the message starts with the "!roll" command
-	if strings.HasPrefix(m.Content, "!roll") {
-		// Roll a six-sided die and send the result as a message
+	switch {
+	case strings.HasPrefix(m.Content, "!roll"):
 		result := rand.Intn(6) + 1
 		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("You rolled a %d!", result))
-	}
-
-	if strings.HasPrefix(m.Content, ".") {
-		// send the result as a message
+	case strings.HasPrefix(m.Content, "."):
 		search := m.Content[1:]
-		ret := ""
 		res, err := c2gptapi.ChatWithGPT(search)
 		if err != nil {
-			ret = fmt.Sprintf("Error: %v", err)
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Error: %v", err))
 		} else {
-			ret = res
+			s.ChannelMessageSend(m.ChannelID, res)
 		}
-		s.ChannelMessageSend(m.ChannelID, ret)
 	}
 }
