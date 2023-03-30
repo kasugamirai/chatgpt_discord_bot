@@ -1,23 +1,22 @@
 package c2gptapi
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 )
 
 const OpenAIAPIURL = "https://api.openai.com/v1/chat/completions"
 
-type Response struct {
-	Choices []struct {
-		Message struct {
-			Content string `json:"content"`
-		} `json:"message"`
-	} `json:"choices"`
+type Choice struct {
+	Delta struct {
+		Content string `json:"content"`
+	} `json:"delta"`
+	Index        int         `json:"index"`
+	FinishReason interface{} `json:"finish_reason"`
 }
 
 type Message struct {
@@ -26,14 +25,25 @@ type Message struct {
 }
 
 type ChatCompletionRequest struct {
-	Model    string    `json:"model"`
-	Messages []Message `json:"messages"`
+	Model       string    `json:"model"`
+	Stream      bool      `json:"stream"`
+	Messages    []Message `json:"messages"`
+	Temperature float64   `json:"temperature,omitempty"`
+	MaxTokens   int       `json:"max_tokens,omitempty"`
 }
 
-func ChatWithGPT(prompt string) (string, error) {
+type Response struct {
+	ID      string   `json:"id"`
+	Object  string   `json:"object"`
+	Created int64    `json:"created"`
+	Model   string   `json:"model"`
+	Choices []Choice `json:"choices"`
+}
+
+func ChatWithGPT(prompt string, output chan string) {
 	apiKey := os.Getenv("OPENAI_API_KEY")
 	if apiKey == "" {
-		return "", fmt.Errorf("error: OPENAI_API_KEY environment variable not set")
+		fmt.Printf("error: OPENAI_API_KEY environment variable not set")
 	}
 	messages := []Message{
 		{
@@ -46,43 +56,51 @@ func ChatWithGPT(prompt string) (string, error) {
 		},
 	}
 
-	requestBody := &ChatCompletionRequest{Model: "gpt-3.5-turbo", Messages: messages}
+	requestBody := &ChatCompletionRequest{
+		Model:       "gpt-3.5-turbo",
+		Messages:    messages,
+		Stream:      true,
+		Temperature: 1,    // Adjust the temperature
+		MaxTokens:   1000, // Adjust the max_tokens
+	}
 	jsonBody, err := json.Marshal(requestBody)
+
 	if err != nil {
-		return "", err
+		fmt.Print(err)
 	}
 
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", OpenAIAPIURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
-		return "", err
+		fmt.Print(err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+apiKey)
 
 	resp, err := client.Do(req)
+
 	if err != nil {
-		return "", err
+		fmt.Print(err)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		response, err := io.ReadAll(resp.Body)
-		return string(response), err
-	}
-
-	responseBody, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
+	scanner := bufio.NewScanner(resp.Body)
 	var response Response
-	err = json.Unmarshal(responseBody, &response)
-	if err != nil {
-		return "Error:", err
-	}
 
-	content := response.Choices[0].Message.Content
-	return content, nil
+	for scanner.Scan() {
+		s := scanner.Bytes()
+		if len(s) > 6 {
+			err = json.Unmarshal(s[6:], &response)
+			if err != nil {
+				fmt.Printf("error unmarshalling JSON data: %v", err)
+			}
+
+			if response.Choices[0].FinishReason == "stop" {
+				break
+			}
+			output <- response.Choices[0].Delta.Content
+		}
+	}
+	close(output)
 }
