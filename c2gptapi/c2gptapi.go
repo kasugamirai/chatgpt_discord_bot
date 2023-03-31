@@ -1,5 +1,7 @@
+// Package c2gptapi provides a simple interface to interact with GPT
 package c2gptapi
 
+// Import required packages
 import (
 	"bufio"
 	"bytes"
@@ -9,8 +11,10 @@ import (
 	"os"
 )
 
+// Define constants
 const OpenAIAPIURL = "https://api.openai.com/v1/chat/completions"
 
+// Define struct types for API request and response
 type Choice struct {
 	Delta struct {
 		Content string `json:"content"`
@@ -40,11 +44,14 @@ type Response struct {
 	Choices []Choice `json:"choices"`
 }
 
+// ChatWithGPT sends a chat completion request to the OpenAI API
 func ChatWithGPT(prompt string, output chan string) {
+	// Get the OpenAI API key from the environment variable
 	apiKey := os.Getenv("OPENAI_API_KEY")
 	if apiKey == "" {
 		fmt.Printf("error: OPENAI_API_KEY environment variable not set")
 	}
+	// Initialize message structure for the API request
 	messages := []Message{
 		{
 			Role:    "system",
@@ -56,6 +63,7 @@ func ChatWithGPT(prompt string, output chan string) {
 		},
 	}
 
+	// Create the chat completion request object
 	requestBody := &ChatCompletionRequest{
 		Model:       "gpt-3.5-turbo",
 		Messages:    messages,
@@ -63,21 +71,25 @@ func ChatWithGPT(prompt string, output chan string) {
 		Temperature: 1,    // Adjust the temperature
 		MaxTokens:   1000, // Adjust the max_tokens
 	}
+	// Convert the request object to JSON
 	jsonBody, err := json.Marshal(requestBody)
 
 	if err != nil {
 		fmt.Print(err)
 	}
 
+	// Create a new HTTP request
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", OpenAIAPIURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		fmt.Print(err)
 	}
 
+	// Set headers for the HTTP request
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+apiKey)
 
+	// Send the HTTP request
 	resp, err := client.Do(req)
 
 	if err != nil {
@@ -85,6 +97,7 @@ func ChatWithGPT(prompt string, output chan string) {
 	}
 	defer resp.Body.Close()
 
+	// Process the API response
 	scanner := bufio.NewScanner(resp.Body)
 	var response Response
 
@@ -104,3 +117,5 @@ func ChatWithGPT(prompt string, output chan string) {
 	}
 	close(output)
 }
+
+// Package main provides the main application to run the Discord
