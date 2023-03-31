@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"xy.com/discordbot/c2gptapi"
@@ -71,12 +72,19 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 		// Start a new Goroutine to chat with the GPT API
 		go c2gptapi.ChatWithGPT(search, output)
-		cnt := 0
+		ticker := time.NewTicker(1 * time.Second)
 
-		for value := range output {
-			ans += value
-			cnt++
-			if cnt%12 == 0 {
+		// Update the bot's message with the GPT API's response
+		for {
+			select {
+			case value, ok := <-output:
+				if !ok {
+					ticker.Stop()
+					_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, ans)
+					return
+				}
+				ans += value
+			case <-ticker.C:
 				_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, ans)
 			}
 		}
