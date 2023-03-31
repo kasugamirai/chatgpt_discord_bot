@@ -54,10 +54,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		msg, _ = s.ChannelMessageSend(m.ChannelID, "Processing...")
 
 		go c2gptapi.ChatWithGPT(search, output)
+		cnt := 0
 
 		for value := range output {
 			ans += value
-			_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, ans)
+			cnt++
+			if cnt%12 == 0 {
+				_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, ans)
+			}
 		}
+		_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, ans)
+		cnt = 0
 	}
 }
