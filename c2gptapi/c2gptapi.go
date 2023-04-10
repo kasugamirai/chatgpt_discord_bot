@@ -23,11 +23,13 @@ type Choice struct {
 	FinishReason interface{} `json:"finish_reason"`
 }
 
+// Message is a structure representing a message sent to the API.
 type Message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
 
+// ChatCompletionRequest is the structure of the request sent to the OpenAI API.
 type ChatCompletionRequest struct {
 	Model       string    `json:"model"`
 	Stream      bool      `json:"stream"`
@@ -53,10 +55,6 @@ func ChatWithGPT(prompt string, output chan string) {
 	}
 	// Initialize message structure for the API request
 	messages := []Message{
-		{
-			Role:    "system",
-			Content: "You are a helpful assistant.",
-		},
 		{
 			Role:    "user",
 			Content: prompt,

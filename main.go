@@ -14,8 +14,7 @@ import (
 	"xy.com/discordbot/c2gptapi"
 )
 
-// main initializes the Discord bot, sets up the event handlers,
-// and starts the bot
+// main initializes the Discord bot, sets up the event handlers, and starts the bot
 func main() {
 	// Get the Discord bot token from the environment variable
 	token := os.Getenv("DISCORD_BOT_TOKEN")
