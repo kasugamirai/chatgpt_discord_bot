@@ -63,11 +63,9 @@ func ChatWithGPT(prompt string, output chan string) {
 
 	// Create the chat completion request object
 	requestBody := &ChatCompletionRequest{
-		Model:       "gpt-3.5-turbo",
-		Messages:    messages,
-		Stream:      true,
-		Temperature: 1,    // Adjust the temperature
-		MaxTokens:   1000, // Adjust the max_tokens
+		Model:    "gpt-4",
+		Messages: messages,
+		Stream:   true,
 	}
 	// Convert the request object to JSON
 	jsonBody, err := json.Marshal(requestBody)

@@ -64,14 +64,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		search := m.Content[1:]
 		output := make(chan string)
 		var msg *discordgo.Message
-		ans := ""
+		builder := &strings.Builder{}
 
 		// Send an initial message to indicate the bot is processing the command
 		msg, _ = s.ChannelMessageSend(m.ChannelID, "Processing...")
 
 		// Start a new Goroutine to chat with the GPT API
 		go c2gptapi.ChatWithGPT(search, output)
-		ticker := time.NewTicker(1 * time.Second)
+		ticker := time.NewTicker(800 * time.Millisecond)
 
 		// Update the bot's message with the GPT API's response
 		for {
@@ -79,12 +79,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			case value, ok := <-output:
 				if !ok {
 					ticker.Stop()
-					_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, ans)
+					_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, builder.String())
 					return
 				}
-				ans += value
+				builder.WriteString(value)
 			case <-ticker.C:
-				_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, ans)
+				_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, builder.String())
 			}
 		}
 	}
