@@ -9,6 +9,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"xy.com/discordbot/bard"
 
 	"github.com/bwmarrin/discordgo"
 	"xy.com/discordbot/c2gptapi"
@@ -87,5 +88,21 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 				_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, builder.String())
 			}
 		}
+	}
+
+	var bardGenerate func(text string)
+	bardGenerate = func(text string) {
+		msg, _ := s.ChannelMessageSend(m.ChannelID, "Processing...")
+		search := m.Content[1:]
+		output, err := bard.GenerateTextResponse(search)
+		if err != nil {
+			_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, output)
+		} else {
+			_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, output)
+		}
+	}
+
+	if strings.HasPrefix(m.Content, "!") || strings.HasPrefix(m.Content, "~") {
+		bardGenerate(m.Content)
 	}
 }
