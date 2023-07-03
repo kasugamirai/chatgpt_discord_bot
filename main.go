@@ -90,19 +90,26 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	var bardGenerate func(text string)
-	bardGenerate = func(text string) {
+	if strings.HasPrefix(m.Content, "!") {
 		msg, _ := s.ChannelMessageSend(m.ChannelID, "Processing...")
 		search := m.Content[1:]
 		output, err := bard.GenerateTextResponse(search)
 		if err != nil {
-			_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, output)
+			_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, fmt.Sprint(err))
 		} else {
 			_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, output)
 		}
 	}
 
-	if strings.HasPrefix(m.Content, "!") || strings.HasPrefix(m.Content, "~") {
-		bardGenerate(m.Content)
+	if strings.HasPrefix(m.Content, "~") {
+		msg, _ := s.ChannelMessageSend(m.ChannelID, "Processing...")
+		search := m.Content[1:]
+		output, err := bard.GenerateChatResponse(search)
+		if err != nil {
+			_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, fmt.Sprint(err))
+		} else {
+			_, _ = s.ChannelMessageEdit(msg.ChannelID, msg.ID, output)
+		}
+
 	}
 }
