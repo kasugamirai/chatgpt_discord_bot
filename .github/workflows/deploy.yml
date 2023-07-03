@@ -53,4 +53,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: "cd /chatgpt && setsid ./discordBot > discordBot.log 2>&1 &"
+          script: |
+            export BARD_API_KEY=${{ secrets.BARD_API_KEY }}
+            export DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
+            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            cd /chatgpt && setsid ./discordBot > discordBot.log 2>&1 &
