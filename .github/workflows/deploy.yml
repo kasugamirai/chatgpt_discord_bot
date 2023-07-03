@@ -44,7 +44,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./discodebot"
+          source: "./discordbot"
           target: "/chatgpt"
 
       - name: Execute remote ssh commands
