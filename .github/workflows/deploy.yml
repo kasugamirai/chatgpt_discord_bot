@@ -19,7 +19,7 @@ jobs:
           go-version: 1.20.3
 
       - name: Build
-        run: go build -o backend
+        run: go build -o discordBot
 
       - name: Check and stop running application
         uses: appleboy/ssh-action@master
@@ -27,7 +27,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: "pkill discordbot || true"
+          script: "pkill discordBot || true"
 
       - name: Check and delete existing application
         uses: appleboy/ssh-action@master
@@ -35,7 +35,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: "test -f /chatgpt/discordbot && rm /chatgpt/discordbot || true"
+          script: "test -f /chatgpt/discordBot && rm /chatgpt/discordBot || true"
 
 
       - name: Copy backend file via ssh
@@ -44,7 +44,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./discordbot"
+          source: "./discordBot"
           target: "/chatgpt"
 
       - name: Execute remote ssh commands
@@ -53,4 +53,4 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: "cd /chatgpt && setsid ./discordbot > discordBot.log 2>&1 &"
+          script: "cd /chatgpt && setsid ./discordBot > discordBot.log 2>&1 &"
