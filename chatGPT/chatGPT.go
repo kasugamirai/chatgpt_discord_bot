@@ -1,5 +1,5 @@
-// Package c2gptapi provides a simple interface to interact with GPT
-package c2gptapi
+// Package chatGPT provides a simple interface to interact with GPT
+package chatGPT
 
 // Import required packages
 import (
