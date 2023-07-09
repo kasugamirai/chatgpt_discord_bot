@@ -53,37 +53,25 @@ func GenerateTextResponse(input string) (string, error) {
 
 	jsonValue, _ := json.Marshal(requestBody)
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
-		return "", fmt.Errorf("creating new request failed: %v", err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("http request failed: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("expected status OK, got %v", resp.StatusCode)
+		return "", fmt.Errorf("The HTTP request failed with error %s", err)
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("reading response body failed: %v", err)
+		return "", fmt.Errorf("Failed to read the response body: %v", err)
 	}
 
-	var responseBody responseBody
+	var responseBody ResponseBody
 	err = json.Unmarshal(body, &responseBody)
 	if err != nil {
-		return "", fmt.Errorf("unmarshalling response body failed: %v", err)
+		return "", fmt.Errorf("Failed to unmarshal the response body: %v", err)
 	}
 
-	if len(responseBody.Candidates) == 0 {
-		return "", fmt.Errorf("no candidates in response")
+	if len(responseBody.Candidates) > 0 {
+		return responseBody.Candidates[0].Content, nil
+	} else {
+		return "", fmt.Errorf("No candidates found in the response")
 	}
-
-	return responseBody.Candidates[0].Output, nil
 }
