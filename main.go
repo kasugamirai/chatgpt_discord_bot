@@ -46,13 +46,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	msg, _ := s.ChannelMessageSend(m.ChannelID, "Processing...")
-
 	if strings.HasPrefix(m.Content, ".") {
+		msg, _ := s.ChannelMessageSend(m.ChannelID, "Processing...")
 		handlers.HandleGPTCommand(s, m, msg)
 	} else if strings.HasPrefix(m.Content, "!") {
+		msg, _ := s.ChannelMessageSend(m.ChannelID, "Processing...")
 		handlers.HandleTextResponseCommand(s, m, msg)
 	} else if strings.HasPrefix(m.Content, "~") {
+		msg, _ := s.ChannelMessageSend(m.ChannelID, "Processing...")
 		handlers.HandleChatResponseCommand(s, m, msg)
 	}
 }
