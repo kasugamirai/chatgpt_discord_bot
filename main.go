@@ -26,8 +26,7 @@ func main() {
 
 	dg.AddHandler(messageCreate)
 
-	err = dg.Open()
-	if err != nil {
+	if err = dg.Open(); err != nil {
 		fmt.Println("Error opening Discord session:", err)
 		return
 	}
@@ -46,14 +45,21 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if strings.HasPrefix(m.Content, ".") {
-		msg, _ := s.ChannelMessageSend(m.ChannelID, "Processing...")
-		handlers.HandleGPTCommand(s, m, msg)
-	} else if strings.HasPrefix(m.Content, "!") {
-		msg, _ := s.ChannelMessageSend(m.ChannelID, "Processing...")
-		handlers.HandleTextResponseCommand(s, m, msg)
-	} else if strings.HasPrefix(m.Content, "~") {
-		msg, _ := s.ChannelMessageSend(m.ChannelID, "Processing...")
-		handlers.HandleChatResponseCommand(s, m, msg)
+	prefixes := map[string]func(s *discordgo.Session, m *discordgo.MessageCreate, msg *discordgo.Message){
+		".": handlers.HandleGPTCommand,
+		"!": handlers.HandleTextResponseCommand,
+		"~": handlers.HandleChatResponseCommand,
+	}
+
+	for prefix, handler := range prefixes {
+		if strings.HasPrefix(m.Content, prefix) {
+			msg, err := s.ChannelMessageSend(m.ChannelID, "Processing...")
+			if err != nil {
+				fmt.Println("Error sending message:", err)
+				return
+			}
+			handler(s, m, msg)
+			return
+		}
 	}
 }
