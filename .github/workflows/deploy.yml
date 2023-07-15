@@ -37,7 +37,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: "test -f /chatgpt/discordBot && rm /chatgpt/discordBot || true"
 
-
       - name: Copy backend file via ssh
         uses: appleboy/scp-action@master
         with:
@@ -58,4 +57,4 @@ jobs:
             export BARD_API_KEY=${{ secrets.BARD_API_KEY }}
             export DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
             export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            setsid ./discordBot > discordBot.log 2>&1 &
+            setsid ./discordBot >> discordBot.log 2>&1 &
