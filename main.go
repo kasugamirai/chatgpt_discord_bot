@@ -46,9 +46,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	prefixes := map[string]func(s *discordgo.Session, m *discordgo.MessageCreate, msg *discordgo.Message){
-		"chatGpt":  handlers.HandleGPTCommand,
-		"bardChat": handlers.HandleTextResponseCommand,
-		"bardText": handlers.HandleChatResponseCommand,
+		".": handlers.HandleGPTCommand,
+		"!": handlers.HandleTextResponseCommand,
+		"~": handlers.HandleChatResponseCommand,
 	}
 
 	for prefix, handler := range prefixes {
