@@ -11,10 +11,10 @@ import (
 	"os"
 )
 
-// Define constants
+// OpenAIAPIURL Define constants
 const OpenAIAPIURL = "https://api.openai.com/v1/chat/completions"
 
-// Define struct types for API request and response
+// Choice Define struct types for API request and response
 type Choice struct {
 	Delta struct {
 		Content string `json:"content"`
