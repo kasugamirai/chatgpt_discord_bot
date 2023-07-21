@@ -22,53 +22,54 @@ func main() {
 		fmt.Println("Error creating Discord session:", err)
 		return
 	}
-
-	commands := []*discordgo.ApplicationCommand{
-		{
-			Name:        "chatGpt",
-			Description: "Interact with GPT-3",
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "input",
-					Description: "Input for GPT-3",
-					Required:    true,
+	/*
+		commands := []*discordgo.ApplicationCommand{
+			{
+				Name:        "chatGpt",
+				Description: "Interact with GPT-3",
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "input",
+						Description: "Input for GPT-3",
+						Required:    true,
+					},
 				},
 			},
-		},
-		{
-			Name:        "bardText",
-			Description: "Generate a text response",
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "input",
-					Description: "Input for bard text response",
-					Required:    true,
+			{
+				Name:        "bardText",
+				Description: "Generate a text response",
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "input",
+						Description: "Input for bard text response",
+						Required:    true,
+					},
 				},
 			},
-		},
-		{
-			Name:        "bardChat",
-			Description: "Generate a chat response",
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "input",
-					Description: "Input for bard chat response",
-					Required:    true,
+			{
+				Name:        "bardChat",
+				Description: "Generate a chat response",
+				Options: []*discordgo.ApplicationCommandOption{
+					{
+						Type:        discordgo.ApplicationCommandOptionString,
+						Name:        "input",
+						Description: "Input for bard chat response",
+						Required:    true,
+					},
 				},
 			},
-		},
-	}
-
-	for _, command := range commands {
-		_, err = dg.ApplicationCommandCreate(dg.State.User.ID, "your guild ID", command)
-		if err != nil {
-			fmt.Println("Cannot create command: ", err)
-			return
 		}
-	}
+
+		for _, command := range commands {
+			_, err = dg.ApplicationCommandCreate(dg.State.User.ID, "your guild ID", command)
+			if err != nil {
+				fmt.Println("Cannot create command: ", err)
+				return
+			}
+		}
+	*/
 
 	dg.AddHandler(handlers.MessageCreate)
 
