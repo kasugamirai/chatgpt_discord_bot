@@ -39,7 +39,7 @@ type ResponseBody struct {
 func GenerateChatResponse(input string) (string, error) {
 	apiKey := os.Getenv("BARD_API_KEY")
 	if apiKey == "" {
-		return "", fmt.Errorf("API_KEY environment variable not set")
+		return "", fmt.Errorf("BARD_API_KEY environment variable not set")
 	}
 
 	url := "https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=" + apiKey

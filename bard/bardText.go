@@ -38,7 +38,7 @@ type requestBody struct {
 func GenerateTextResponse(input string) (string, error) {
 	apiKey := os.Getenv("BARD_API_KEY")
 	if apiKey == "" {
-		return "", fmt.Errorf("API_KEY environment variable not set")
+		return "", fmt.Errorf("BARD_API_KEY environment variable not set")
 	}
 
 	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateText?key=%s", apiKey)
